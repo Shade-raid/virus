@@ -2,476 +2,1366 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Idle Virus — Digital Plague</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#0b0f17;--card:#0f1720;--accent:#00ff9c;--muted:#98a0b3;--danger:#ff5c7a;--glow:0 0 12px rgba(0,255,156,0.6),0 0 24px rgba(0,255,156,0.3)}
-    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;background:var(--bg);color:#e6eef8;}
-    body{display:flex;align-items:center;justify-content:center;overflow:hidden}
-    .app{width:900px;max-width:98%;height:90vh;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:18px;box-shadow:0 10px 40px rgba(2,6,23,0.7);overflow:hidden;position:relative}
+    /*
+     * =========================================
+     * ROOT & CORE STYLES
+     * =========================================
+     */
+    :root {
+      --bg: #0b0f17;
+      --card: #0f1720;
+      --accent: #00ff9c;
+      --muted: #98a0b3;
+      --danger: #ff5c7a;
+      --text: #e6eef8;
+      --glow: 0 0 12px rgba(0, 255, 156, 0.6), 0 0 24px rgba(0, 255, 156, 0.3);
+      --shadow: 0 10px 40px rgba(2, 6, 23, 0.7);
+      --border-radius-md: 12px;
+      --border-radius-lg: 18px;
+    }
 
-    /* Splash */
-    .splash{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at center, rgba(0,255,156,0.12), transparent 70%),rgba(3,6,10,0.8);backdrop-filter:blur(6px);z-index:30;animation:fadeIn 1s ease}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    .logo{font-weight:800;font-size:36px;display:flex;align-items:center;gap:14px;text-shadow:var(--glow)}
-    .logo .symbol{width:90px;height:90px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),#00e0d0);color:#02111a;font-weight:900;font-size:28px;box-shadow:var(--glow)}
-    .splash p{color:var(--muted);max-width:70%;text-align:center;margin:14px 0 28px}
-    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 18px;border-radius:10px;color:var(--accent);cursor:pointer;font-weight:700;transition:all .2s}
-    .btn:hover{background:rgba(0,255,156,0.06);box-shadow:var(--glow)}
-    .btn.secondary{border-color:rgba(255,255,255,0.03);color:var(--muted);background:rgba(255,255,255,0.01)}
-    .btn.danger.is-confirming { background: var(--danger); border-color: transparent; color: #fff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.5); }
+    html {
+      box-sizing: border-box;
+    }
 
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
 
-    .main{display:flex;height:100%}
-    aside{width:280px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));padding:16px;box-sizing:border-box;overflow-y:auto}
-    main{flex:1;padding:16px;box-sizing:border-box;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
 
-    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);padding:12px;border-radius:12px;margin-top:12px;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
-    .panel:first-child{margin-top:0}
-    .stat-row{display:flex;justify-content:space-between;align-items:center}
-    .big-counter{font-size:28px;font-weight:800;color:var(--accent);text-shadow:var(--glow)}
-    .infect-btn{height:100px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at center, rgba(0,255,156,0.15), rgba(0,255,156,0.04));border:2px solid rgba(0,255,152,0.1);cursor:pointer;transition:all .15s;box-shadow:var(--glow)}
-    .infect-btn:hover{transform:scale(1.05)}
-    .upgrade{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-top:6px;background:rgba(255,255,255,0.02);transition:all .15s;font-size:13px}
-    .upgrade:hover{background:rgba(0,255,156,0.05)}
-    .upgrade button{padding:6px 10px;border-radius:6px;border:none;background:var(--accent);color:#02111a;font-weight:700;cursor:pointer;transition:all .2s;font-size:11px}
-    .upgrade button:hover{box-shadow:var(--glow)}
-    .upgrade button:disabled{background:rgba(255,255,255,0.1);color:var(--muted);cursor:not-allowed;box-shadow:none}
-    .cost{color:var(--muted);font-size:11px}
-    #mapCanvas{width:100%;height:200px;background:#02060d;border-radius:12px;display:block;margin-top:8px;}
-    #logBox{margin-top:8px;max-height:80px;overflow-y:auto;font-size:11px;color:var(--muted);}
-    .bar-bg{width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;margin-top:4px}
-    .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--danger));border-radius:4px;transition:width 0.3s;width:0%}
-    .meta{font-size:12px;color:var(--muted);margin-top:8px}
-    .hidden{display:none}
-    .upgrade-title{font-weight:600;color:var(--accent);font-size:12px}
-    .upgrade-desc{font-size:10px;color:var(--muted);margin-top:2px}
-    .upgrades-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-    .upgrade.grid{margin-top:0;flex-direction:column;align-items:flex-start;padding:10px}
-    .upgrade.grid .upgrade-info{width:100%;margin-bottom:8px}
-    .upgrade.grid button{width:100%}
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /*
+     * =========================================
+     * MAIN LAYOUT & APP CONTAINER
+     * =========================================
+     */
+    .app {
+      width: min(95vw, 1000px);
+      height: min(95vh, 800px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+    }
+
+    .main {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    aside {
+      width: min(300px, 35%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.005));
+      padding: 16px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    main {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 300px;
+    }
+
+    /* Responsive layout */
+    @media (max-width: 768px) {
+      .app {
+        flex-direction: column;
+      }
+      
+      aside {
+        width: 100%;
+        height: auto;
+        max-height: 40vh;
+      }
+      
+      main {
+        min-height: 60vh;
+      }
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00e0d0;
+    }
+
+    /*
+     * =========================================
+     * SPLASH SCREEN
+     * =========================================
+     */
+    .splash {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: radial-gradient(circle at center, rgba(0, 255, 156, 0.12), transparent 70%), rgba(3, 6, 10, 0.9);
+      backdrop-filter: blur(8px);
+      z-index: 30;
+      animation: fadeIn 0.6s ease;
+      padding: 20px;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: clamp(24px, 4vw, 36px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-shadow: var(--glow);
+      margin-bottom: 1rem;
+    }
+
+    .logo .symbol {
+      width: clamp(60px, 10vw, 90px);
+      height: clamp(60px, 10vw, 90px);
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), #00e0d0);
+      color: #02111a;
+      font-weight: 900;
+      font-size: clamp(18px, 3vw, 28px);
+      box-shadow: var(--glow);
+    }
+
+    .splash p {
+      color: var(--muted);
+      max-width: min(70%, 400px);
+      margin: 14px 0 28px;
+      line-height: 1.5;
+    }
+
+    /*
+     * =========================================
+     * COMPONENTS (Buttons, Panels, etc.)
+     * =========================================
+     */
+
+    /* General Button Styles */
+    .btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px 18px;
+      border-radius: 10px;
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s ease-in-out;
+      text-shadow: 0 0 8px transparent;
+      font-size: 14px;
+      min-height: 44px; /* Better touch targets */
+    }
+    .btn:hover:not(:disabled) {
+      background: rgba(0, 255, 156, 0.06);
+      box-shadow: var(--glow);
+      transform: translateY(-1px);
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn.secondary {
+      border-color: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.01);
+    }
+    .btn.danger.is-confirming {
+      background: var(--danger);
+      border-color: transparent;
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    /* Panel Styles */
+    .panel {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent);
+      padding: 14px;
+      border-radius: var(--border-radius-md);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      transition: transform 0.2s ease;
+    }
+    .panel:hover {
+      transform: translateY(-2px);
+    }
+    aside .panel:not(:first-child) {
+      margin-top: 16px;
+    }
+
+    /* Stat & Counter Styles */
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .big-counter {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 800;
+      color: var(--accent);
+      text-shadow: var(--glow);
+    }
+
+    /* Inject Button */
+    .infect-btn {
+      min-height: 120px;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, rgba(0, 255, 156, 0.15), rgba(0, 255, 156, 0.04));
+      border: 2px solid rgba(0, 255, 152, 0.1);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--glow);
+      position: relative;
+      overflow: hidden;
+    }
+    .infect-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent, rgba(0, 255, 156, 0.1), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+    .infect-btn:hover::before {
+      transform: translateX(100%);
+    }
+    .infect-btn:hover {
+      transform: scale(1.02);
+      border-color: rgba(0, 255, 152, 0.3);
+      box-shadow: var(--glow), 0 0 30px rgba(0, 255, 156, 0.2);
+    }
+    .infect-btn:active {
+      transform: scale(0.98);
+    }
+    .infect-btn h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      position: relative;
+      z-index: 1;
+    }
+    .infect-btn p {
+      margin: 0;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Upgrade Items */
+    .upgrade {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      transition: all 0.2s ease;
+      font-size: 13px;
+      border: 1px solid transparent;
+    }
+    .upgrade:not(:first-of-type) {
+        margin-top: 8px;
+    }
+    .upgrade:hover {
+      background: rgba(0, 255, 156, 0.05);
+      border-color: rgba(0, 255, 156, 0.1);
+      transform: translateX(4px);
+    }
+    .upgrade button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      background: var(--accent);
+      color: #02111a;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 11px;
+      min-height: 36px;
+    }
+    .upgrade button:hover:not(:disabled) {
+      box-shadow: var(--glow);
+      transform: scale(1.05);
+    }
+    .upgrade button:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .upgrades-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .upgrade.grid {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 12px;
+    }
+    .upgrade.grid .upgrade-info {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .upgrade.grid button {
+      width: 100%;
+    }
+    .upgrade-title {
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .upgrade-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+    .upgrade-lore {
+      font-size: 10px;
+      color: rgba(152, 160, 179, 0.7);
+      font-style: italic;
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+    .cost {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Threat Progress Bar */
+    .bar-bg {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 6px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--danger));
+      border-radius: 5px;
+      transition: width 0.3s ease-in-out;
+      width: 0%;
+      box-shadow: 0 0 10px rgba(0, 255, 156, 0.4);
+    }
+
+    /* Canvas and Log Box */
+    #mapCanvas {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #02060d, #030a15);
+      border-radius: var(--border-radius-md);
+      display: block;
+      margin: 8px 0;
+      border: 1px solid rgba(0, 255, 156, 0.1);
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    #logBox {
+      margin-top: 8px;
+      height: 100px;
+      overflow-y: auto;
+      font-size: 11px;
+      color: var(--muted);
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: 'Courier New', monospace;
+      line-height: 1.4;
+    }
+    .log-entry {
+      padding: 2px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      transition: color 0.3s ease;
+    }
+    .log-entry.important {
+      color: var(--accent);
+    }
+
+    /* Utility Classes */
+    .meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .hidden {
+      display: none !important;
+    }
+    
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    /* Section Headers */
+    .section-header {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(0, 255, 156, 0.2);
+    }
+
+    /* Performance indicators */
+    .perf-indicator {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
   <div class="app" id="app">
+    <div class="perf-indicator" id="fpsCounter">FPS: --</div>
+
     <div class="splash" id="splash">
-      <div class="logo">
+      <header class="logo">
         <div class="symbol">IV</div>
-        <div><div style="font-size:20px">Idle Virus</div><div style="font-size:12px;color:var(--muted)">Digital Plague — v2</div></div>
-      </div>
+        <div>
+          <h1 style="font-size:20px; margin:0;">Idle Virus</h1>
+          <p style="font-size:12px; color:var(--muted); margin:0;">Digital Plague — v2.1</p>
+        </div>
+      </header>
       <p>Spread your code across devices. Unlock real virus-inspired upgrades. Recompile for permanent improvements when threat levels get too high.</p>
-      <div style="display:flex;gap:10px">
-        <button class="btn" id="startBtn">Start New Infection</button>
-        <button class="btn secondary danger" id="wipeBtn">Wipe Save</button>
+      <div style="display:flex; gap:12px; flex-wrap: wrap; justify-content: center;">
+        <button type="button" class="btn" id="startBtn">Start New Infection</button>
+        <button type="button" class="btn secondary" id="loadBtn">Load Game</button>
+        <button type="button" class="btn secondary danger" id="wipeBtn">Wipe Save</button>
       </div>
-      <div class="meta" style="margin-top:10px">Tip: Recompiling is key to long-term growth.</div>
+      <footer class="meta" style="margin-top:15px">
+        Tip: Recompiling is key to long-term growth. Use keyboard shortcuts: Space = Inject, R = Recompile
+      </footer>
     </div>
 
     <div class="main hidden" id="gameMain">
       <aside>
-        <div class="panel">
-          <div class="stat-row"><div>IP: <span id="ipCount">0</span></div><div>IP/sec: <span id="ipPerSec">0</span></div></div>
-          <div style="margin-top:8px">Threat: <div class="bar-bg"><div class="bar-fill" id="threatFill"></div></div></div>
-          <div class="meta" id="antivirusState">Antivirus: Idle</div>
+        <section class="panel" aria-labelledby="stats-heading">
+          <h2 id="stats-heading" class="section-header">Core Statistics</h2>
+          <div class="stat-row">
+            <div>IP: <span id="ipCount" class="big-counter" aria-live="polite">0</span></div>
+            <div>IP/sec: <span id="ipPerSec" aria-live="polite">0</span></div>
+          </div>
+          <div style="margin-top:10px">
+            <label for="threat-progress">Threat Level:</label>
+            <div class="bar-bg">
+              <div id="threatFill" class="bar-fill" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+          <div id="antivirusState" class="meta" aria-live="polite">Antivirus: Idle</div>
           <div class="meta">Code Fragments: <span id="fragmentCount">0</span> (+<span id="prestigeBonus">0.0</span>% boost)</div>
-        </div>
+          <div class="meta">Uptime: <span id="uptime">00:00:00</span></div>
+        </section>
 
-        <div class="panel" id="recompilePanel">
-            <div class="meta">Recompile Core</div>
-            <div class="upgrade-desc" style="font-size:11px; margin-top:4px;">When threat is critical (>90%), recompile your virus. This resets progress but grants Code Fragments, permanently boosting IP gain.</div>
-            <div class="meta">Fragments on reset: <span id="fragmentsOnReset">0</span></div>
-            <button id="recompileBtn" class="btn" style="width:100%; margin-top:8px;" disabled>Recompile Virus</button>
-        </div>
+        <section class="panel" id="recompilePanel" aria-labelledby="recompile-heading">
+          <h2 id="recompile-heading" class="section-header">Recompile Core</h2>
+          <p class="upgrade-desc" style="font-size:11px; margin-top:4px;">When threat is critical (&gt;90%), recompile your virus. This resets progress but grants Code Fragments, permanently boosting IP gain.</p>
+          <div class="meta">Fragments on reset: <span id="fragmentsOnReset">0</span></div>
+          <button id="recompileBtn" type="button" class="btn" style="width:100%; margin-top:10px;" disabled>Recompile Virus</button>
+        </section>
 
-        <div class="panel">
-          <div class="meta">Upgrades</div>
+        <section class="panel" aria-labelledby="upgrades-heading">
+          <h2 id="upgrades-heading" class="section-header">Basic Upgrades</h2>
           <div id="upgradesUI"></div>
-        </div>
+        </section>
 
-        <div class="panel">
-          <canvas id="mapCanvas"></canvas>
-          <div class="meta">Infected Network Map</div>
-        </div>
-
-        <div id="logBox"></div>
+        <section class="panel" aria-labelledby="map-heading">
+           <h2 id="map-heading" class="section-header">Network Map</h2>
+           <canvas id="mapCanvas" role="img" aria-label="A visualization of infected computer nodes connected by lines."></canvas>
+           <div id="logBox" role="log" aria-live="polite" aria-label="Game event log"></div>
+        </section>
       </aside>
 
       <main>
-        <div class="infect-btn" id="infectBtn"><h2>Inject</h2><p id="infectHint">+1 IP per click</p></div>
+        <section class="infect-btn" id="infectBtn" role="button" tabindex="0" aria-labelledby="infect-heading">
+          <h2 id="infect-heading">Inject Payload</h2>
+          <p id="infectHint">+1 IP per click</p>
+        </section>
         
-        <div class="panel">
-          <div class="meta">Advanced Upgrades</div>
+        <section class="panel" aria-labelledby="advanced-upgrades-heading">
+          <h2 id="advanced-upgrades-heading" class="section-header">Advanced Upgrades</h2>
           <div id="advancedUpgradesUI"></div>
-        </div>
+        </section>
+
+        <section class="panel" aria-labelledby="achievements-heading">
+          <h2 id="achievements-heading" class="section-header">Achievements</h2>
+          <div id="achievementsUI">
+            <p class="upgrade-desc">Achievement system coming soon...</p>
+          </div>
+        </section>
       </main>
     </div>
   </div>
 
   <script>
-    /* ======= CONSTANTS & CONFIG ======= */
-    const CONSTANTS = {
+    /* ======= CONFIGURATION ======= */
+    const CONFIG = {
         UPGRADE_COST_SCALING: 1.15,
         ADVANCED_UPGRADE_COST_SCALING: 1.25,
         THREAT_PER_CLICK: 0.5,
         BASE_THREAT_DECAY_PER_SEC: 1.5,
-        PRESTIGE_BONUS_PER_FRAGMENT: 0.05, // 5% boost per fragment
-        AUTOSAVE_INTERVAL: 10000, // in ms
+        PRESTIGE_BONUS_PER_FRAGMENT: 0.05,
+        AUTOSAVE_INTERVAL: 5000, // Reduced for better UX
+        MAX_LOG_MESSAGES: 25,
+        MAX_INFECTED_NODES: 60,
+        NODE_CONNECTION_DISTANCE: 80,
+        NODE_LIFESPAN_FRAMES: 1200,
+        SAVE_KEY: 'idleVirusSave_v2_1',
+        FPS_UPDATE_INTERVAL: 1000,
+        MAX_DELTA_TIME: 1/30 // Cap delta time for stability
     };
 
-    /* ======= STATE ======= */
-    const getInitialState = () => ({
-      ip: 0,
-      ipPerSec: 0,
-      ipPerClick: 1,
-      threat: 0,
-      fragments: 0,
-      upgrades: {},
-      autoInfectRate: 0,
-      threatDecayMultiplier: 1,
-      fragmentGainMultiplier: 1,
-      lastTick: Date.now(),
-      infectedNodes: []
-    });
-
-    let state = getInitialState();
-
-    /* ======= UPGRADES ======= */
     const ALL_UPGRADES = {
-        'morris': {type:'basic', title:'Morris Worm',desc:'First worm: +0.5 IP/sec',cost:50,effect:s=>s.ipPerSec+=0.5,lore:'The first worm, unleashed from MIT, proved the net could be crippled.'},
-        'iloveyou': {type:'basic', title:'ILOVEYOU',desc:'Social engineering: +5% click spread',cost:200,effect:s=>s.autoInfectRate+=0.05,lore:'A love letter that broke millions of hearts.'},
-        'conficker': {type:'basic', title:'Conficker',desc:'+5 IP/sec from botnets',cost:500,effect:s=>s.ipPerSec+=5,lore:'Conficker turned countless machines into a silent army.'},
-        'stuxnet': {type:'basic', title:'Stuxnet',desc:'Doubles effect of Code Fragments',cost:2500,effect:s=>{/* Handled via prestige multiplier calc */},lore:'A worm that sabotaged centrifuges in the real world.'},
-        'wannacry': {type:'advanced', title:'WannaCry',desc:'+3 IP/click, spreads to 3 devices',cost:10000,effect:s=>{s.ipPerClick+=3;s.autoInfectRate+=0.1},lore:'Ransomware that spread like wildfire across hospitals.'},
-        'emotet': {type:'advanced', title:'Emotet',desc:'+15% IP/sec scaling',cost:25000,effect:s=>s.ipPerSec*=1.15,lore:'A resilient parasite that re-infected networks repeatedly.'},
-        'mirai': {type:'advanced', title:'Mirai Botnet',desc:'IoT infection: +50 IP/sec',cost:75000,effect:s=>s.ipPerSec+=50,lore:'Hijacked cameras and routers into a massive DDoS army.'},
-        'notpetya': {type:'advanced', title:'NotPetya',desc:'Destructive wiper: ×3 threat decay',cost:150000,effect:s=>s.threatDecayMultiplier=3,lore:'A cyber-weapon disguised as ransomware.'},
-        'ryuk': {type:'advanced', title:'Ryuk',desc:'Targeted ransomware: +100% Fragment gain',cost:500000,effect:s=>s.fragmentGainMultiplier+=1,lore:'Precision strikes against high-value targets.'},
-        'solarwinds': {type:'advanced', title:'SolarWinds',desc:'Supply chain: +1 base IP/sec per upgrade owned',cost:2000000,effect:s=>{/* Handled in passive gain calc */},lore:'The most sophisticated supply chain attack in history.'}
+        'morris': {
+            type: 'basic', 
+            title: 'Morris Worm',
+            desc: 'First network worm: +0.5 IP/sec',
+            cost: 50,
+            effect: s => s.ipPerSec += 0.5,
+            lore: 'The first worm, unleashed from MIT, proved the net could be crippled.'
+        },
+        'iloveyou': {
+            type: 'basic', 
+            title: 'ILOVEYOU',
+            desc: 'Social engineering: +5% lateral movement',
+            cost: 200,
+            effect: s => s.autoInfectRate += 0.05,
+            lore: 'A love letter that broke millions of hearts and email servers.'
+        },
+        'conficker': {
+            type: 'basic', 
+            title: 'Conficker',
+            desc: 'Botnet formation: +5 IP/sec',
+            cost: 500,
+            effect: s => s.ipPerSec += 5,
+            lore: 'Conficker turned countless machines into a silent army.'
+        },
+        'stuxnet': {
+            type: 'basic', 
+            title: 'Stuxnet',
+            desc: 'State-sponsored precision: Doubles Fragment effect',
+            cost: 2500,
+            effect: s => {/* Handled via prestige multiplier calc */},
+            lore: 'A cyber weapon that physically destroyed centrifuges.'
+        },
+        'wannacry': {
+            type: 'advanced', 
+            title: 'WannaCry',
+            desc: 'Ransomware outbreak: +3 IP/click, +10% spread',
+            cost: 10000,
+            effect: s => {s.ipPerClick += 3; s.autoInfectRate += 0.1;},
+            lore: 'Ransomware that crippled hospitals and infrastructure worldwide.'
+        },
+        'emotet': {
+            type: 'advanced', 
+            title: 'Emotet Banking Trojan',
+            desc: 'Modular malware: +15% IP/sec multiplier',
+            cost: 25000,
+            effect: s => s.ipPerSec *= 1.15,
+            lore: 'A resilient parasite that evolved and re-infected networks.'
+        },
+        'mirai': {
+            type: 'advanced', 
+            title: 'Mirai IoT Botnet',
+            desc: 'IoT takeover: +50 IP/sec from devices',
+            cost: 75000,
+            effect: s => s.ipPerSec += 50,
+            lore: 'Hijacked cameras and routers into a massive DDoS army.'
+        },
+        'notpetya': {
+            type: 'advanced', 
+            title: 'NotPetya Wiper',
+            desc: 'Destructive payload: ×3 threat decay speed',
+            cost: 150000,
+            effect: s => s.threatDecayMultiplier = 3,
+            lore: 'A devastating cyber weapon disguised as ransomware.'
+        },
+        'ryuk': {
+            type: 'advanced', 
+            title: 'Ryuk Targeted Attack',
+            desc: 'Precision targeting: +100% Fragment gain',
+            cost: 500000,
+            effect: s => s.fragmentGainMultiplier += 1,
+            lore: 'Surgical strikes against high-value corporate targets.'
+        },
+        'solarwinds': {
+            type: 'advanced', 
+            title: 'SolarWinds Supply Chain',
+            desc: 'Nation-state operation: +1 IP/sec per upgrade',
+            cost: 2000000,
+            effect: s => {/* Handled in passive gain calc */},
+            lore: 'The most sophisticated supply chain attack in history.'
+        }
     };
 
-    /* ======= DOM ======= */
-    const $ = id => document.getElementById(id);
-    const ipCount = $('ipCount'), ipPerSec = $('ipPerSec'), infectBtn = $('infectBtn');
-    const infectHint = $('infectHint'), upgradesUI = $('upgradesUI'), mapCanvas = $('mapCanvas');
-    const logBox = $('logBox'), startBtn = $('startBtn'), wipeBtn = $('wipeBtn');
-    const splash = $('splash'), gameMain = $('gameMain'), threatFill = $('threatFill');
-    const antivirusState = $('antivirusState'), fragmentCount = $('fragmentCount');
-    const advancedUpgradesUI = $('advancedUpgradesUI'), recompileBtn = $('recompileBtn');
-    const prestigeBonus = $('prestigeBonus'), fragmentsOnReset = $('fragmentsOnReset');
-    const ctx = mapCanvas.getContext('2d');
-
-    /* ======= GAME LOGIC ======= */
-    function formatNumber(num) {
-      if (num < 1000) return num.toFixed(0);
-      const suffixes = ['', 'k', 'M', 'B', 'T', 'Qa', 'Qi'];
-      const i = Math.floor(Math.log10(num) / 3);
-      if (i >= suffixes.length) return num.toExponential(2);
-      return (num / Math.pow(1000, i)).toFixed(2) + suffixes[i];
-    }
-
-    function addLog(message) {
-      const div = document.createElement('div');
-      div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-      logBox.insertBefore(div, logBox.firstChild);
-      if (logBox.children.length > 20) logBox.removeChild(logBox.lastChild);
-    }
-    
-    function calculatePrestigeMultiplier() {
-        let stuxnetMultiplier = state.upgrades.stuxnet ? 2 : 1;
-        return 1 + (state.fragments * CONSTANTS.PRESTIGE_BONUS_PER_FRAGMENT * stuxnetMultiplier);
-    }
-
-    function calculatePassiveIPS() {
-        let solarwindsBonus = 0;
-        if(state.upgrades.solarwinds){
-            solarwindsBonus = Object.keys(state.upgrades).length;
-        }
-        return (state.ipPerSec + solarwindsBonus) * calculatePrestigeMultiplier();
-    }
-    
-    function calculateClickIPS() {
-        return state.ipPerClick * calculatePrestigeMultiplier();
-    }
-
-    function updateUI() {
-        const passiveIPS = calculatePassiveIPS();
-        const clickIPS = calculateClickIPS();
-
-        ipCount.textContent = formatNumber(state.ip);
-        ipPerSec.textContent = formatNumber(passiveIPS);
-        infectHint.textContent = `+${formatNumber(clickIPS)} IP per click`;
-        fragmentCount.textContent = formatNumber(state.fragments);
-        prestigeBonus.textContent = ((calculatePrestigeMultiplier() - 1) * 100).toFixed(1);
-
-        const threatPercent = Math.min(state.threat / 100, 1) * 100;
-        threatFill.style.width = threatPercent + '%';
-
-        if (state.threat > 80) {
-            antivirusState.textContent = 'Antivirus: ALERT';
-            antivirusState.style.color = 'var(--danger)';
-        } else if (state.threat > 50) {
-            antivirusState.textContent = 'Antivirus: Scanning';
-            antivirusState.style.color = 'var(--accent)';
-        } else {
-            antivirusState.textContent = 'Antivirus: Idle';
-            antivirusState.style.color = 'var(--muted)';
+    /* ======= UTILITY FUNCTIONS ======= */
+    class Utils {
+        static formatNumber(num) {
+            if (num < 1000) return Math.floor(num).toString();
+            const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc'];
+            const magnitude = Math.floor(Math.log10(Math.abs(num)) / 3);
+            if (magnitude >= suffixes.length) return num.toExponential(2);
+            const scaled = num / Math.pow(1000, magnitude);
+            return scaled.toFixed(scaled < 10 ? 2 : 1) + suffixes[magnitude];
         }
 
-        // Recompile section update
-        const canRecompile = state.threat > 90;
-        recompileBtn.disabled = !canRecompile;
-        const fragmentsToGain = canRecompile ? Math.floor(Math.sqrt(state.ip / 10000) * state.fragmentGainMultiplier) : 0;
-        fragmentsOnReset.textContent = formatNumber(fragmentsToGain);
-        
-        // Update upgrade buttons (more efficient than rebuilding)
-        updateUpgradeButtons();
-    }
-    
-    function initUpgrades() {
-        upgradesUI.innerHTML = '';
-        advancedUpgradesUI.innerHTML = '<div class="upgrades-grid"></div>';
-        const grid = advancedUpgradesUI.querySelector('.upgrades-grid');
+        static formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
 
-        for (const id in ALL_UPGRADES) {
-            const upgrade = ALL_UPGRADES[id];
+        static lerp(a, b, t) {
+            return a + (b - a) * t;
+        }
+
+        static clamp(value, min, max) {
+            return Math.min(Math.max(value, min), max);
+        }
+
+        static debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    }
+
+    /* ======= PERFORMANCE MONITOR ======= */
+    class PerformanceMonitor {
+        constructor() {
+            this.frameCount = 0;
+            this.lastFpsUpdate = Date.now();
+            this.fps = 0;
+            this.dom = document.getElementById('fpsCounter');
+        }
+
+        update() {
+            this.frameCount++;
+            const now = Date.now();
+            if (now - this.lastFpsUpdate >= CONFIG.FPS_UPDATE_INTERVAL) {
+                this.fps = Math.round((this.frameCount * 1000) / (now - this.lastFpsUpdate));
+                this.frameCount = 0;
+                this.lastFpsUpdate = now;
+                this.dom.textContent = `FPS: ${this.fps}`;
+                this.dom.style.color = this.fps < 30 ? 'var(--danger)' : 'var(--accent)';
+            }
+        }
+    }
+
+    /* ======= IMPROVED STATE MANAGEMENT ======= */
+    class GameState {
+        constructor() {
+            this.reset();
+            this.gameStartTime = Date.now();
+        }
+
+        reset() {
+            this.ip = 0;
+            this.ipPerSec = 0;
+            this.ipPerClick = 1;
+            this.threat = 0;
+            this.fragments = 0;
+            this.upgrades = {};
+            this.autoInfectRate = 0;
+            this.threatDecayMultiplier = 1;
+            this.fragmentGainMultiplier = 1;
+            this.lastTick = Date.now();
+            this.infectedNodes = [];
+            this.totalClicks = 0;
+            this.totalInfections = 0;
+        }
+
+        getPrestigeMultiplier() {
+            const stuxnetMultiplier = this.upgrades.stuxnet ? 2 : 1;
+            return 1 + (this.fragments * CONFIG.PRESTIGE_BONUS_PER_FRAGMENT * stuxnetMultiplier);
+        }
+
+        getPassiveIPS() {
+            const solarwindsBonus = this.upgrades.solarwinds ? Object.keys(this.upgrades).length : 0;
+            return (this.ipPerSec + solarwindsBonus) * this.getPrestigeMultiplier();
+        }
+
+        getClickIPS() {
+            return this.ipPerClick * this.getPrestigeMultiplier();
+        }
+
+        getFragmentsOnReset() {
+            if (this.threat <= 90) return 0;
+            return Math.floor(Math.sqrt(this.ip / 10000) * this.fragmentGainMultiplier);
+        }
+
+        getUptime() {
+            return (Date.now() - this.gameStartTime) / 1000;
+        }
+
+        // Validation method to ensure state integrity
+        validate() {
+            this.ip = Math.max(0, this.ip || 0);
+            this.threat = Utils.clamp(this.threat || 0, 0, 150);
+            this.fragments = Math.max(0, this.fragments || 0);
+            this.infectedNodes = Array.isArray(this.infectedNodes) ? this.infectedNodes : [];
+            this.upgrades = this.upgrades || {};
+        }
+    }
+
+    /* ======= ENHANCED UI MANAGEMENT ======= */
+    class UIManager {
+        constructor() {
+            this.dom = {
+                ipCount: document.getElementById('ipCount'),
+                ipPerSec: document.getElementById('ipPerSec'),
+                infectHint: document.getElementById('infectHint'),
+                fragmentCount: document.getElementById('fragmentCount'),
+                prestigeBonus: document.getElementById('prestigeBonus'),
+                threatFill: document.getElementById('threatFill'),
+                antivirusState: document.getElementById('antivirusState'),
+                recompileBtn: document.getElementById('recompileBtn'),
+                fragmentsOnReset: document.getElementById('fragmentsOnReset'),
+                logBox: document.getElementById('logBox'),
+                upgradesUI: document.getElementById('upgradesUI'),
+                advancedUpgradesUI: document.getElementById('advancedUpgradesUI'),
+                mapCanvas: document.getElementById('mapCanvas'),
+                uptime: document.getElementById('uptime')
+            };
+            this.ctx = this.dom.mapCanvas.getContext('2d');
+            this.lastThreat = 0;
+            this.animationQueue = [];
+        }
+
+        initCanvas() {
+            const resizeCanvas = () => {
+                if (this.dom.mapCanvas.offsetWidth > 0) {
+                    this.dom.mapCanvas.width = this.dom.mapCanvas.offsetWidth * window.devicePixelRatio;
+                    this.dom.mapCanvas.height = this.dom.mapCanvas.offsetHeight * window.devicePixelRatio;
+                    this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+                }
+            };
+            
+            setTimeout(resizeCanvas, 100);
+            window.addEventListener('resize', Utils.debounce(resizeCanvas, 250));
+        }
+
+        updateAll(state) {
+            // Update core stats with smooth animations
+            this.updateCounters(state);
+            this.updateThreat(state.threat);
+            this.updateRecompile(state);
+            this.updateUpgradeButtons(state);
+            this.renderMap(state.infectedNodes);
+            this.dom.uptime.textContent = Utils.formatTime(state.getUptime());
+        }
+
+        updateCounters(state) {
+            this.dom.ipCount.textContent = Utils.formatNumber(state.ip);
+            this.dom.ipPerSec.textContent = Utils.formatNumber(state.getPassiveIPS());
+            this.dom.infectHint.textContent = `+${Utils.formatNumber(state.getClickIPS())} IP per click`;
+            this.dom.fragmentCount.textContent = Utils.formatNumber(state.fragments);
+            this.dom.prestigeBonus.textContent = ((state.getPrestigeMultiplier() - 1) * 100).toFixed(1);
+        }
+
+        updateThreat(threat) {
+            const threatPercent = Utils.clamp(threat, 0, 100);
+            this.dom.threatFill.style.width = `${threatPercent}%`;
+            this.dom.threatFill.setAttribute('aria-valuenow', threatPercent.toFixed(0));
+
+            // Dynamic threat state with smooth color transitions
+            if (threat > 90) {
+                this.dom.antivirusState.innerHTML = '🔴 Antivirus: <strong>CRITICAL ALERT</strong>';
+                this.dom.antivirusState.style.color = 'var(--danger)';
+            } else if (threat > 70) {
+                this.dom.antivirusState.innerHTML = '🟡 Antivirus: <strong>HIGH THREAT</strong>';
+                this.dom.antivirusState.style.color = '#ff9500';
+            } else if (threat > 40) {
+                this.dom.antivirusState.innerHTML = '🟠 Antivirus: <strong>Scanning...</strong>';
+                this.dom.antivirusState.style.color = 'var(--accent)';
+            } else {
+                this.dom.antivirusState.innerHTML = '🟢 Antivirus: Idle';
+                this.dom.antivirusState.style.color = 'var(--muted)';
+            }
+
+            // Add screen shake effect on high threat
+            if (threat > 95 && this.lastThreat <= 95) {
+                this.addScreenShake();
+            }
+            this.lastThreat = threat;
+        }
+
+        addScreenShake() {
+            document.body.style.animation = 'none';
+            document.body.offsetHeight; // Trigger reflow
+            document.body.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                document.body.style.animation = '';
+            }, 500);
+            
+            // Add CSS for shake animation if not exists
+            if (!document.querySelector('#shake-style')) {
+                const style = document.createElement('style');
+                style.id = 'shake-style';
+                style.textContent = `
+                    @keyframes shake {
+                        0%, 100% { transform: translateX(0); }
+                        25% { transform: translateX(-2px); }
+                        75% { transform: translateX(2px); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        updateRecompile(state) {
+            const canRecompile = state.threat > 90;
+            this.dom.recompileBtn.disabled = !canRecompile;
+            this.dom.fragmentsOnReset.textContent = Utils.formatNumber(state.getFragmentsOnReset());
+            
+            if (canRecompile) {
+                this.dom.recompileBtn.style.background = 'linear-gradient(45deg, var(--danger), #ff8c00)';
+                this.dom.recompileBtn.style.color = '#fff';
+            } else {
+                this.dom.recompileBtn.style.background = '';
+                this.dom.recompileBtn.style.color = '';
+            }
+        }
+
+        addLog(message, type = 'normal') {
             const div = document.createElement('div');
+            div.className = `log-entry ${type === 'important' ? 'important' : ''}`;
+            div.innerHTML = `<span style="color: var(--muted);">[${new Date().toLocaleTimeString()}]</span> ${message}`;
             
-            if (upgrade.type === 'basic') {
-                div.className = 'upgrade';
-                div.innerHTML = `
-                  <div>
-                    <div class="upgrade-title">${upgrade.title} <span data-owned="${id}"></span></div>
-                    <div class="upgrade-desc">${upgrade.desc}</div>
-                    <div class="cost" data-cost="${id}">Cost: ${formatNumber(upgrade.cost)} IP</div>
-                  </div>
-                  <button data-upgrade="${id}">Buy</button>
-                `;
-                upgradesUI.appendChild(div);
-            } else { // advanced
-                div.className = 'upgrade grid';
-                div.innerHTML = `
-                  <div class="upgrade-info">
-                    <div class="upgrade-title">${upgrade.title} <span data-owned="${id}"></span></div>
-                    <div class="upgrade-desc">${upgrade.desc}</div>
-                    <div class="cost" data-cost="${id}">Cost: ${formatNumber(upgrade.cost)} IP</div>
-                  </div>
-                  <button data-upgrade="${id}">Buy</button>
-                `;
-                grid.appendChild(div);
-            }
-        }
-    }
-    
-    function updateUpgradeButtons() {
-        for (const id in ALL_UPGRADES) {
-            const upgrade = ALL_UPGRADES[id];
-            const owned = state.upgrades[id] || 0;
-            const costMultiplier = upgrade.type === 'advanced' ? CONSTANTS.ADVANCED_UPGRADE_COST_SCALING : CONSTANTS.UPGRADE_COST_SCALING;
-            const currentCost = Math.floor(upgrade.cost * Math.pow(costMultiplier, owned));
+            this.dom.logBox.insertBefore(div, this.dom.logBox.firstChild);
             
-            const btn = document.querySelector(`button[data-upgrade="${id}"]`);
-            const costEl = document.querySelector(`div[data-cost="${id}"]`);
-            const ownedEl = document.querySelector(`span[data-owned="${id}"]`);
-
-            if (btn && costEl && ownedEl) {
-                btn.disabled = state.ip < currentCost;
-                costEl.textContent = `Cost: ${formatNumber(currentCost)} IP`;
-                ownedEl.textContent = owned > 0 ? `(Lv ${owned})` : '';
+            if (this.dom.logBox.children.length > CONFIG.MAX_LOG_MESSAGES) {
+                this.dom.logBox.removeChild(this.dom.logBox.lastChild);
             }
+
+            // Auto-scroll to new messages
+            this.dom.logBox.scrollTop = 0;
         }
-    }
-
-    function buyUpgrade(id) {
-        const upgrade = ALL_UPGRADES[id];
-        if (!upgrade) return;
-
-        const owned = state.upgrades[id] || 0;
-        const costMultiplier = upgrade.type === 'advanced' ? CONSTANTS.ADVANCED_UPGRADE_COST_SCALING : CONSTANTS.UPGRADE_COST_SCALING;
-        const cost = Math.floor(upgrade.cost * Math.pow(costMultiplier, owned));
-
-        if (state.ip >= cost) {
-            state.ip -= cost;
-            state.upgrades[id] = owned + 1;
-            upgrade.effect(state);
-            addLog(`Deployed ${upgrade.title}! ${upgrade.lore}`);
-            updateUI(); // Full UI refresh after state change
-            saveGame();
-        }
-    }
-
-    function infectClick() {
-        const gain = calculateClickIPS();
-        state.ip += gain;
-        state.threat += CONSTANTS.THREAT_PER_CLICK;
-
-        if (Math.random() < state.autoInfectRate) {
-            const bonus = Math.floor(gain * 2);
-            state.ip += bonus;
-            addLog(`Lateral movement! +${formatNumber(bonus)} bonus IP`);
-        }
-
-        if (Math.random() < 0.3) addInfectedNode();
-        updateUI();
-    }
-    
-    function recompileVirus() {
-        const canRecompile = state.threat > 90;
-        if (!canRecompile) return;
         
-        const fragmentsGained = Math.floor(Math.sqrt(state.ip / 10000) * state.fragmentGainMultiplier);
-        if (fragmentsGained <= 0) {
-             addLog("Recompile aborted: Not enough progress to gain fragments.");
-             return;
-        }
+        initUpgrades() {
+            const basicContainer = this.dom.upgradesUI;
+            const advancedContainer = this.dom.advancedUpgradesUI;
+            
+            basicContainer.innerHTML = '';
+            advancedContainer.innerHTML = '<div class="upgrades-grid"></div>';
+            const advancedGrid = advancedContainer.querySelector('.upgrades-grid');
 
-        const oldFragments = state.fragments;
-        const newState = getInitialState();
-        newState.fragments = oldFragments + fragmentsGained;
-        
-        state = newState;
-        
-        addLog(`RECOMPILE COMPLETE. Gained ${formatNumber(fragmentsGained)} fragments. Virus rebooted stronger.`);
-        saveGame();
-        updateUI();
-    }
-
-    function addInfectedNode() {
-        if (state.infectedNodes.length >= 50) return;
-        if (!mapCanvas.width) return;
-
-        const node = {
-            x: Math.random() * (mapCanvas.width - 20) + 10,
-            y: Math.random() * (mapCanvas.height - 20) + 10,
-            age: 0,
-            type: Math.random() < 0.7 ? 'pc' : Math.random() < 0.5 ? 'server' : 'mobile'
-        };
-        state.infectedNodes.push(node);
-    }
-
-    function renderMap() {
-        if (!mapCanvas.width || mapCanvas.offsetWidth === 0) return;
-        
-        ctx.fillStyle = '#02060d';
-        ctx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
-
-        ctx.strokeStyle = 'rgba(0, 255, 156, 0.1)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < state.infectedNodes.length; i++) {
-            for (let j = i + 1; j < state.infectedNodes.length; j++) {
-                const from = state.infectedNodes[i];
-                const to = state.infectedNodes[j];
-                const dist = Math.hypot(from.x - to.x, from.y - to.y);
-                if (dist < 100) { // Only draw lines between close nodes
-                    ctx.globalAlpha = 1 - (dist / 100);
-                    ctx.beginPath();
-                    ctx.moveTo(from.x, from.y);
-                    ctx.lineTo(to.x, to.y);
-                    ctx.stroke();
+            for (const [id, upgrade] of Object.entries(ALL_UPGRADES)) {
+                const div = document.createElement('div');
+                
+                if (upgrade.type === 'basic') {
+                    div.className = 'upgrade';
+                    div.innerHTML = `
+                      <div>
+                        <div class="upgrade-title">${upgrade.title} <span data-owned="${id}"></span></div>
+                        <div class="upgrade-desc">${upgrade.desc}</div>
+                        <div class="upgrade-lore">${upgrade.lore}</div>
+                        <div class="cost" data-cost="${id}"></div>
+                      </div>
+                      <button type="button" data-upgrade="${id}" title="${upgrade.lore}">Buy</button>`;
+                    basicContainer.appendChild(div);
+                } else {
+                    div.className = 'upgrade grid';
+                    div.innerHTML = `
+                      <div class="upgrade-info">
+                        <div class="upgrade-title">${upgrade.title} <span data-owned="${id}"></span></div>
+                        <div class="upgrade-desc">${upgrade.desc}</div>
+                        <div class="upgrade-lore">${upgrade.lore}</div>
+                        <div class="cost" data-cost="${id}"></div>
+                      </div>
+                      <button type="button" data-upgrade="${id}" title="${upgrade.lore}">Buy</button>`;
+                    advancedGrid.appendChild(div);
                 }
             }
         }
-        ctx.globalAlpha = 1.0;
-        
-        state.infectedNodes.forEach(node => {
-            const alpha = Math.max(0.3, 1 - node.age / 1000);
-            if (node.type === 'server') {
-                ctx.fillStyle = `rgba(255, 92, 122, ${alpha})`;
-                ctx.fillRect(node.x - 3, node.y - 3, 6, 6);
-            } else {
-                ctx.fillStyle = `rgba(0, 255, 156, ${alpha})`;
-                ctx.beginPath();
-                ctx.arc(node.x, node.y, 3, 0, Math.PI * 2);
-                ctx.fill();
+
+        updateUpgradeButtons(state) {
+            for (const [id, upgrade] of Object.entries(ALL_UPGRADES)) {
+                const owned = state.upgrades[id] || 0;
+                const costMultiplier = upgrade.type === 'advanced' ? CONFIG.ADVANCED_UPGRADE_COST_SCALING : CONFIG.UPGRADE_COST_SCALING;
+                const currentCost = Math.floor(upgrade.cost * Math.pow(costMultiplier, owned));
+                
+                const btn = document.querySelector(`button[data-upgrade="${id}"]`);
+                const costEl = document.querySelector(`div[data-cost="${id}"]`);
+                const ownedEl = document.querySelector(`span[data-owned="${id}"]`);
+
+                if (!btn || !costEl || !ownedEl) continue;
+
+                btn.disabled = state.ip < currentCost;
+                costEl.innerHTML = `Cost: <strong>${Utils.formatNumber(currentCost)}</strong> IP`;
+                ownedEl.textContent = owned > 0 ? `(Lv ${owned})` : '';
+                
+                // Visual feedback for affordable upgrades
+                const upgradeDiv = btn.closest('.upgrade');
+                if (state.ip >= currentCost) {
+                    upgradeDiv.style.borderColor = 'rgba(0, 255, 156, 0.3)';
+                    upgradeDiv.style.boxShadow = '0 0 10px rgba(0, 255, 156, 0.1)';
+                } else {
+                    upgradeDiv.style.borderColor = '';
+                    upgradeDiv.style.boxShadow = '';
+                }
             }
-            node.age++;
-        });
-        state.infectedNodes = state.infectedNodes.filter(node => node.age < 1000);
-    }
-
-    function gameLoop() {
-        const now = Date.now();
-        const deltaTime = (now - state.lastTick) / 1000;
-        state.lastTick = now;
-
-        state.ip += calculatePassiveIPS() * deltaTime;
-        state.threat = Math.max(0, state.threat - deltaTime * CONSTANTS.BASE_THREAT_DECAY_PER_SEC * state.threatDecayMultiplier);
+        }
         
-        updateUI();
-        renderMap();
-        requestAnimationFrame(gameLoop);
-    }
+        renderMap(nodes) {
+            const canvas = this.dom.mapCanvas;
+            if (!canvas.width || !canvas.height) return;
+            
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+            
+            // Clear canvas with animated background
+            this.ctx.fillStyle = '#02060d';
+            this.ctx.fillRect(0, 0, width, height);
+            
+            // Add animated grid background
+            this.ctx.strokeStyle = 'rgba(0, 255, 156, 0.05)';
+            this.ctx.lineWidth = 1;
+            const gridSize = 20;
+            const offset = Date.now() * 0.01 % gridSize;
+            
+            for (let x = -offset; x < width + gridSize; x += gridSize) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, 0);
+                this.ctx.lineTo(x, height);
+                this.ctx.stroke();
+            }
+            for (let y = -offset; y < height + gridSize; y += gridSize) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, y);
+                this.ctx.lineTo(width, y);
+                this.ctx.stroke();
+            }
 
-    function saveGame() {
-        localStorage.setItem('idleVirusSave_v2', JSON.stringify(state));
-    }
-
-    function loadGame() {
-        const save = localStorage.getItem('idleVirusSave_v2');
-        if (save) {
-            const savedState = JSON.parse(save);
-            // Deep merge to handle new properties in future updates
-            Object.assign(state, savedState);
-            state.lastTick = Date.now();
-            addLog('Save file found. Resuming infection...');
-        } else {
-            addLog('No save file found. Initializing new digital plague...');
+            // Draw connections with improved visuals
+            this.ctx.lineWidth = 1;
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const from = nodes[i];
+                    const to = nodes[j];
+                    const dist = Math.hypot(from.x - to.x, from.y - to.y);
+                    if (dist < CONFIG.NODE_CONNECTION_DISTANCE) {
+                        const alpha = Math.max(0.1, 1 - (dist / CONFIG.NODE_CONNECTION_DISTANCE));
+                        this.ctx.strokeStyle = `rgba(0, 255, 156, ${alpha * 0.3})`;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(from.x, from.y);
+                        this.ctx.lineTo(to.x, to.y);
+                        this.ctx.stroke();
+                        
+                        // Add data flow animation
+                        if (Math.random() < 0.1) {
+                            const progress = (Date.now() * 0.005) % 1;
+                            const flowX = Utils.lerp(from.x, to.x, progress);
+                            const flowY = Utils.lerp(from.y, to.y, progress);
+                            this.ctx.fillStyle = `rgba(0, 255, 156, ${alpha})`;
+                            this.ctx.beginPath();
+                            this.ctx.arc(flowX, flowY, 1, 0, Math.PI * 2);
+                            this.ctx.fill();
+                        }
+                    }
+                }
+            }
+            
+            // Draw nodes with enhanced visuals
+            nodes.forEach(node => {
+                const alpha = Math.max(0.3, 1 - node.age / CONFIG.NODE_LIFESPAN_FRAMES);
+                const pulse = 1 + 0.2 * Math.sin(Date.now() * 0.01 + node.x * 0.1);
+                
+                if (node.type === 'server') {
+                    this.ctx.fillStyle = `rgba(255, 92, 122, ${alpha})`;
+                    this.ctx.fillRect(node.x - 3 * pulse, node.y - 3 * pulse, 6 * pulse, 6 * pulse);
+                    // Add server glow
+                    this.ctx.shadowColor = 'rgba(255, 92, 122, 0.5)';
+                    this.ctx.shadowBlur = 5;
+                    this.ctx.fillRect(node.x - 2, node.y - 2, 4, 4);
+                    this.ctx.shadowBlur = 0;
+                } else {
+                    this.ctx.fillStyle = `rgba(0, 255, 156, ${alpha})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(node.x, node.y, 3 * pulse, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    // Add node glow
+                    this.ctx.shadowColor = 'rgba(0, 255, 156, 0.5)';
+                    this.ctx.shadowBlur = 3;
+                    this.ctx.beginPath();
+                    this.ctx.arc(node.x, node.y, 2, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.shadowBlur = 0;
+                }
+            });
         }
     }
 
-    function resetGame() {
-        localStorage.removeItem('idleVirusSave_v2');
-        state = getInitialState();
-        saveGame();
-        location.reload();
+    /* ======= ENHANCED GAME LOGIC & CONTROLLER ======= */
+    class GameManager {
+        constructor() {
+            this.state = new GameState();
+            this.ui = new UIManager();
+            this.perf = new PerformanceMonitor();
+            this.gameLoop = this.gameLoop.bind(this);
+            this.wipeConfirmTimeout = null;
+            this.isRunning = false;
+            this.saveQueue = Utils.debounce(() => this.save(), 1000);
+        }
+
+        init() {
+            this.setupEventListeners();
+            this.setupKeyboardShortcuts();
+            setInterval(() => this.save(), CONFIG.AUTOSAVE_INTERVAL);
+        }
+
+        start() {
+            this.load();
+            this.state.gameStartTime = Date.now() - (this.state.gameStartTime || 0);
+            
+            document.getElementById('splash').style.display = 'none';
+            document.getElementById('gameMain').classList.remove('hidden');
+            
+            this.ui.initCanvas();
+            this.ui.initUpgrades();
+            this.ui.updateAll(this.state);
+            
+            this.isRunning = true;
+            requestAnimationFrame(this.gameLoop);
+            
+            this.ui.addLog('🦠 Digital plague initialized. Beginning infection protocol...', 'important');
+        }
+
+        gameLoop() {
+            if (!this.isRunning) return;
+            
+            const now = Date.now();
+            let deltaTime = Math.min((now - this.state.lastTick) / 1000, CONFIG.MAX_DELTA_TIME);
+            this.state.lastTick = now;
+
+            // Update game state
+            this.updatePassiveGain(deltaTime);
+            this.updateThreatDecay(deltaTime);
+            this.updateInfectedNodes();
+            
+            // Validate state integrity
+            this.state.validate();
+            
+            // Update UI
+            this.ui.updateAll(this.state);
+            this.perf.update();
+            
+            requestAnimationFrame(this.gameLoop);
+        }
+
+        updatePassiveGain(deltaTime) {
+            const passiveGain = this.state.getPassiveIPS() * deltaTime;
+            this.state.ip += passiveGain;
+            
+            // Add random infection events
+            if (Math.random() < 0.001 && this.state.autoInfectRate > 0) {
+                const bonusGain = passiveGain * 2;
+                this.state.ip += bonusGain;
+                this.ui.addLog(`🌐 Worm propagation! +${Utils.formatNumber(bonusGain)} bonus IP`);
+            }
+        }
+
+        updateThreatDecay(deltaTime) {
+            this.state.threat = Math.max(0, 
+                this.state.threat - deltaTime * CONFIG.BASE_THREAT_DECAY_PER_SEC * this.state.threatDecayMultiplier
+            );
+        }
+
+        updateInfectedNodes() {
+            this.state.infectedNodes.forEach(node => {
+                node.age++;
+                // Add slight drift to make nodes feel alive
+                node.x += (Math.random() - 0.5) * 0.1;
+                node.y += (Math.random() - 0.5) * 0.1;
+            });
+            this.state.infectedNodes = this.state.infectedNodes.filter(node => 
+                node.age < CONFIG.NODE_LIFESPAN_FRAMES
+            );
+        }
+
+        infectClick() {
+            const gain = this.state.getClickIPS();
+            this.state.ip += gain;
+            this.state.threat += CONFIG.THREAT_PER_CLICK;
+            this.state.totalClicks++;
+
+            // Enhanced lateral movement mechanics
+            if (Math.random() < this.state.autoInfectRate) {
+                const bonus = Math.floor(gain * (2 + Math.random()));
+                this.state.ip += bonus;
+                this.state.totalInfections++;
+                
+                const messages = [
+                    `🔄 Lateral movement detected! +${Utils.formatNumber(bonus)} IP`,
+                    `🌊 Infection spreading! +${Utils.formatNumber(bonus)} IP`,
+                    `🎯 Zero-day exploit! +${Utils.formatNumber(bonus)} IP`,
+                    `⚡ Buffer overflow! +${Utils.formatNumber(bonus)} IP`
+                ];
+                this.ui.addLog(messages[Math.floor(Math.random() * messages.length)]);
+            }
+
+            // Visual feedback
+            this.addClickEffect();
+            if (Math.random() < 0.4) this.addInfectedNode();
+            this.saveQueue();
+        }
+
+        addClickEffect() {
+            const btn = document.getElementById('infectBtn');
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+            }, 100);
+        }
+
+        buyUpgrade(id) {
+            const upgrade = ALL_UPGRADES[id];
+            if (!upgrade) return;
+
+            const owned = this.state.upgrades[id] || 0;
+            const costMultiplier = upgrade.type === 'advanced' ? CONFIG.ADVANCED_UPGRADE_COST_SCALING : CONFIG.UPGRADE_COST_SCALING;
+            const cost = Math.floor(upgrade.cost * Math.pow(costMultiplier, owned));
+
+            if (this.state.ip >= cost) {
+                this.state.ip -= cost;
+                this.state.upgrades[id] = owned + 1;
+                upgrade.effect(this.state);
+                
+                const messages = [
+                    `💾 ${upgrade.title} deployed successfully!`,
+                    `🔧 ${upgrade.title} installation complete!`,
+                    `⚙️ ${upgrade.title} module activated!`
+                ];
+                this.ui.addLog(messages[Math.floor(Math.random() * messages.length)], 'important');
+                this.ui.addLog(`📖 ${upgrade.lore}`);
+                
+                this.save();
+            }
+        }
+        
+        recompileVirus() {
+            const fragmentsGained = this.state.getFragmentsOnReset();
+            if (fragmentsGained <= 0) {
+                 this.ui.addLog("❌ Recompile aborted: Threat level insufficient for fragment generation.");
+                 return;
+            }
+
+            const oldFragments = this.state.fragments;
+            const oldUptime = this.state.getUptime();
+            this.state.reset();
+            this.state.fragments = oldFragments + fragmentsGained;
+            this.state.gameStartTime = Date.now();
+            
+            this.ui.addLog(`🔄 RECOMPILE SEQUENCE INITIATED...`, 'important');
+            setTimeout(() => {
+                this.ui.addLog(`💎 Gained ${Utils.formatNumber(fragmentsGained)} Code Fragments`, 'important');
+                this.ui.addLog(`🚀 Virus core recompiled with enhanced capabilities`);
+                this.ui.addLog(`📊 Previous session: ${Utils.formatTime(oldUptime)} uptime`);
+            }, 500);
+            
+            this.save();
+        }
+
+        addInfectedNode() {
+            if (this.state.infectedNodes.length >= CONFIG.MAX_INFECTED_NODES || !this.ui.dom.mapCanvas.width) return;
+            
+            const canvas = this.ui.dom.mapCanvas;
+            this.state.infectedNodes.push({
+                x: Math.random() * (canvas.offsetWidth - 40) + 20,
+                y: Math.random() * (canvas.offsetHeight - 40) + 20,
+                age: 0,
+                type: this.getRandomNodeType()
+            });
+        }
+
+        getRandomNodeType() {
+            const rand = Math.random();
+            if (rand < 0.6) return 'pc';
+            if (rand < 0.85) return 'mobile';
+            return 'server';
+        }
+
+        save() {
+            try {
+                const saveData = {
+                    ...this.state,
+                    gameStartTime: Date.now() - this.state.getUptime() * 1000,
+                    version: '2.1'
+                };
+                localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(saveData));
+            } catch (e) {
+                console.error("Failed to save game:", e);
+                this.ui.addLog("❌ Error: Could not save game progress.");
+            }
+        }
+
+        load() {
+            const savedData = localStorage.getItem(CONFIG.SAVE_KEY);
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    Object.assign(this.state, parsedData);
+                    this.state.lastTick = Date.now();
+                    this.state.validate();
+                    this.ui.addLog('💾 Save file loaded. Resuming digital plague...', 'important');
+                } catch (e) {
+                    console.error("Failed to load game state:", e);
+                    this.ui.addLog('❌ Error loading save. Starting fresh infection.');
+                }
+            } else {
+                this.ui.addLog('🆕 No save file detected. Initializing new digital plague...', 'important');
+            }
+        }
+        
+        reset() {
+            localStorage.removeItem(CONFIG.SAVE_KEY);
+            this.isRunning = false;
+            location.reload();
+        }
+
+        setupEventListeners() {
+            // Main menu buttons
+            document.getElementById('startBtn').addEventListener('click', () => this.start());
+            document.getElementById('loadBtn').addEventListener('click', () => this.start());
+            
+            // Game buttons
+            document.getElementById('infectBtn').addEventListener('click', () => this.infectClick());
+            document.getElementById('recompileBtn').addEventListener('click', () => this.recompileVirus());
+            
+            // Wipe button with enhanced confirmation
+            const wipeBtn = document.getElementById('wipeBtn');
+            wipeBtn.addEventListener('click', () => {
+                if (wipeBtn.classList.contains('is-confirming')) {
+                    clearTimeout(this.wipeConfirmTimeout);
+                    this.ui.addLog('💀 Save file wiped. System memory purged.', 'important');
+                    this.reset();
+                } else {
+                    wipeBtn.textContent = 'Confirm Wipe?';
+                    wipeBtn.classList.add('is-confirming');
+                    this.wipeConfirmTimeout = setTimeout(() => {
+                        wipeBtn.textContent = 'Wipe Save';
+                        wipeBtn.classList.remove('is-confirming');
+                    }, 4000);
+                }
+            });
+
+            // Upgrade purchases
+            document.addEventListener('click', (e) => {
+                const button = e.target.closest('button[data-upgrade]');
+                if (button && !button.disabled) {
+                    this.buyUpgrade(button.dataset.upgrade);
+                }
+            });
+
+            // Prevent context menu on game elements
+            document.getElementById('app').addEventListener('contextmenu', e => e.preventDefault());
+        }
+
+        setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                if (!this.isRunning) return;
+                
+                switch (e.code) {
+                    case 'Space':
+                        e.preventDefault();
+                        this.infectClick();
+                        break;
+                    case 'KeyR':
+                        if (e.ctrlKey || e.metaKey) break; // Don't interfere with page refresh
+                        e.preventDefault();
+                        if (!document.getElementById('recompileBtn').disabled) {
+                            this.recompileVirus();
+                        }
+                        break;
+                }
+            });
+        }
     }
 
-    /* ======= EVENT LISTENERS ======= */
-    startBtn.addEventListener('click', () => {
-        loadGame();
-        splash.style.display = 'none'; // More performant than adding/removing class
-        gameMain.classList.remove('hidden');
-        
-        initUpgrades(); // Build the upgrade UI once
-        
-        setTimeout(() => {
-            mapCanvas.width = mapCanvas.offsetWidth;
-            mapCanvas.height = mapCanvas.offsetHeight;
-        }, 100);
-        
-        gameLoop();
-    });
-
-    let wipeConfirmTimeout;
-    wipeBtn.addEventListener('click', () => {
-        if (wipeBtn.classList.contains('is-confirming')) {
-            clearTimeout(wipeConfirmTimeout);
-            addLog('Save file wiped. System memory erased.');
-            resetGame();
-        } else {
-            wipeBtn.textContent = 'Confirm Wipe?';
-            wipeBtn.classList.add('is-confirming');
-            wipeConfirmTimeout = setTimeout(() => {
-                wipeBtn.textContent = 'Wipe Save';
-                wipeBtn.classList.remove('is-confirming');
-            }, 3000);
-        }
-    });
-
-    infectBtn.addEventListener('click', infectClick);
-    recompileBtn.addEventListener('click', recompileVirus);
-    
-    // Event delegation for all upgrade buttons
-    document.addEventListener('click', (e) => {
-        if (e.target.tagName === 'BUTTON' && e.target.dataset.upgrade) {
-            buyUpgrade(e.target.dataset.upgrade);
-        }
-    });
-
-    setInterval(saveGame, CONSTANTS.AUTOSAVE_INTERVAL);
+    // Initialize and run the game
+    const game = new GameManager();
+    game.init();
   </script>
 </body>
 </html>
-
